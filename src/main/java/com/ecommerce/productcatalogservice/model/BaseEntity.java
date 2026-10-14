@@ -1,10 +1,7 @@
 package com.ecommerce.productcatalogservice.model;
 
 import com.ecommerce.productcatalogservice.model.enums.State;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +15,7 @@ public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(value = EnumType.STRING)
     private State state;
     private Date createdAt;
     private Date lastUpdatedAt;

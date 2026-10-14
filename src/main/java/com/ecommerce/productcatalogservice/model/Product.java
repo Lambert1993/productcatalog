@@ -1,9 +1,6 @@
 package com.ecommerce.productcatalogservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ManyToAny;
@@ -15,11 +12,13 @@ import java.math.BigDecimal;
 @Entity
 public class Product extends BaseEntity{
 
+    @Column(unique = true)
     private String name;
     @Column(precision = 20, scale = 3)
     private BigDecimal price;
     private String description;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="category_id")
     private Category category;
 }
