@@ -9,12 +9,16 @@ import com.ecommerce.productcatalogservice.service.IProductPitchService;
 import com.ecommerce.productcatalogservice.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,8 +37,24 @@ public class ProductController {
     }
 
     @GetMapping
-    List<Product> getAllProducts(){
-        return List.of();
+    public ResponseEntity<List<ProductDto>> getAllProducts(){
+
+        List<Product> products = storageService.getAllProducts();
+
+        List<ProductDto> resp = products.stream().map(x->from(x)).toList();
+           return new ResponseEntity<>(resp,HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public PagedModel<ProductDto> getProductsInPriceRange(@RequestParam(required = false)BigDecimal minPrice,
+                                                                @RequestParam(required = false) BigDecimal maxPrice,
+                                                                Pageable pageable){
+
+
+        Page<ProductDto> products = storageService.getProductsInPriceRange(minPrice,maxPrice,pageable).map(this::from);
+
+            return new PagedModel<ProductDto>(products);
+
     }
 
     @GetMapping("/{id}")
@@ -101,6 +121,21 @@ public class ProductController {
            return new ResponseEntity<>("Unable to delete the product of this id: "+id,HttpStatus.NOT_FOUND);
 
        return new ResponseEntity<>("Successfully deleted the product of id: "+id,HttpStatus.OK);
+    }
+
+
+    @PatchMapping
+    public ResponseEntity<?>  updateProductInfo(@RequestBody ProductDto dto){
+
+        if(null==dto.getId())
+            return new ResponseEntity<String>("Unable to proceed with product info", HttpStatus.INTERNAL_SERVER_ERROR);
+
+      Product updatedProduct = storageService.updateProductInfo(dto);
+
+        if(null==updatedProduct)
+            return new ResponseEntity<String>("product not found", HttpStatus.INTERNAL_SERVER_ERROR);
+
+        return new ResponseEntity<ProductDto>(from(updatedProduct),HttpStatus.OK);
     }
 
     private ProductDto from (Product product){

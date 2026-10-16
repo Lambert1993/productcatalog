@@ -6,18 +6,21 @@ import com.ecommerce.productcatalogservice.model.Category;
 import com.ecommerce.productcatalogservice.model.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Slf4j
 public class DummyProductService implements IProductService {
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public DummyProductService(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
@@ -53,6 +56,26 @@ public class DummyProductService implements IProductService {
     @Override
     public Boolean deleteProductById(Long id) {
         return false;
+    }
+
+    @Override
+    public String importAllDummyProducts() {
+        return "";
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return null;
+    }
+
+    @Override
+    public Page<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Product updateProductInfo(ProductDto dto) {
+        return null;
     }
 
     private Product from(DummyJsonProductDto dummyJsonProductDto){

@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Entity
 public class Product extends BaseEntity{
 
-    @Column(unique = true)
+    //@Column(unique = true)
     private String name;
     @Column(precision = 20, scale = 3)
     private BigDecimal price;

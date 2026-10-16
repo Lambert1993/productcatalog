@@ -9,9 +9,13 @@ import com.ecommerce.productcatalogservice.repository.CategoryRepository;
 import com.ecommerce.productcatalogservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Primary
@@ -81,6 +85,65 @@ public class StorageProductService implements IProductService{
         product.setState(State.INACTIVE);
         productRepository.save(product);
         return true;
+    }
+
+    @Override
+    public String importAllDummyProducts() {
+        return "";
+    }
+
+    @Override
+    public List<Product> getAllProducts() {
+        return productRepository.findAllBy();
+    }
+
+    @Override
+    public Page<Product> getProductsInPriceRange(BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
+
+
+        Page<Product> product =productRepository.findByPriceBetweenAndState(minPrice,maxPrice,State.ACTIVE,pageable);
+
+        return product;
+    }
+
+    @Override
+    public Product updateProductInfo(ProductDto dto) {
+
+        Product product = productRepository.findById(dto.getId()).orElse(null);
+
+        if(null==product)
+            return null;
+
+        // Only update if the field was explicitly provided in the request
+        if (dto.getName() != null) {
+            product.setName(dto.getName());
+        }
+
+        if (dto.getDescription() != null) {
+            product.setDescription(dto.getDescription());
+        }
+
+        if (dto.getPrice() != null) {
+            product.setPrice(dto.getPrice());
+        }
+
+
+        Category category = product.getCategory();
+
+        if(null!=category) {
+            // Only update if the field was explicitly provided in the request
+            if (dto.getCategory().getName() != null) {
+                category.setName(dto.getCategory().getName());
+            }
+
+            if (dto.getCategory().getDescription() != null) {
+                category.setDescription(dto.getCategory().getDescription());
+            }
+            product.setCategory(category);
+        }
+
+       return productRepository.save(product);
+
     }
 
     private Category findCategoryByName(String name){
